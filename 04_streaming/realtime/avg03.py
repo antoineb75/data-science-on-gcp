@@ -51,6 +51,7 @@ def by_airport(event):
 
 
 def run(project, bucket, region):
+    print("project: {} / bucket: {} / region: {}".format(project,bucket,region))
     argv = [
         '--project={0}'.format(project),
         '--job_name=ch04avgdelay',
@@ -61,7 +62,8 @@ def run(project, bucket, region):
         '--autoscaling_algorithm=THROUGHPUT_BASED',
         '--max_num_workers=8',
         '--region={}'.format(region),
-        '--runner=DataflowRunner'
+        '--runner=DataflowRunner',
+        '--subnetwork=https://www.googleapis.com/compute/v1/projects/poc-dbs/regions/europe-west4/subnetworks/europe-subnet-west4'
     ]
 
     with beam.Pipeline(argv=argv) as pipeline:
@@ -77,6 +79,7 @@ def run(project, bucket, region):
                                   )
 
         all_events = (events['arrived'], events['departed']) | beam.Flatten()
+        print(all_events)
 
         stats = (all_events
                  | 'byairport' >> beam.Map(by_airport)

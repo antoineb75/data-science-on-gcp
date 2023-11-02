@@ -1,0 +1,5 @@
+pytz
+google-cloud-pubsub
+google-cloud-bigquery
+apache-beam
+apache_beam[gcp]
