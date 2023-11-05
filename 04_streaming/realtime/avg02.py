@@ -72,7 +72,7 @@ def run(project, bucket, region):
 
             events[event_name] = (pipeline
                                   | 'read:{}'.format(event_name) >> beam.io.ReadFromPubSub(
-                                                topic=topic_name, timestamp_attribute='EventTimeStamp')
+                                                topic=topic_name)
                                   | 'parse:{}'.format(event_name) >> beam.Map(lambda s: json.loads(s))
                                   )
 
@@ -88,9 +88,9 @@ def run(project, bucket, region):
         stats_schema = ','.join(['AIRPORT:string,AVG_ARR_DELAY:float,AVG_DEP_DELAY:float',
                                  'NUM_FLIGHTS:int64,START_TIME:timestamp,END_TIME:timestamp'])
         (stats
-         | 'bqout' >> beam.io.WriteToBigQuery(
-                    'dsongcp.streaming_delays', schema=stats_schema,
-                    create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+         | 'bqout' >> beam.io.gcp.bigquery.WriteToBigQuery(
+                    table='dsongcp.streaming_delays', 
+                    schema=stats_schema
                 )
          )
 
