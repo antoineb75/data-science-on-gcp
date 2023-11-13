@@ -33,7 +33,7 @@ def publish(publisher, topics, allevents, notify_time):
       # the client automatically batches
       logging.info('Publishing {} {} till {}'.format(len(events), key, timestamp))
       for event_data in events:
-          publisher.publish(topic, event_data.encode(), EventTimeStamp=timestamp)
+          publisher.publish(topic, event_data.encode()) #, EventTimeStamp=timestamp)
 
 def notify(publisher, topics, rows, simStartTime, programStart, speedFactor):
    # sleep computation

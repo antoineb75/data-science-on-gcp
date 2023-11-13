@@ -82,7 +82,7 @@ def run(project, bucket, region):
                  | 'byairport' >> beam.Map(by_airport)
                  | 'window' >> beam.WindowInto(beam.window.SlidingWindows(60 * 60, 5 * 60))
                  | 'group' >> beam.GroupByKey()
-                 | 'stats' >> beam.Map(lambda x: compute_stats(x[0], x[1]))
+                 | 'stats' >> beam.Map(lambda x: compute_stats(x[0], x[1]))                
         )
 
         stats_schema = ','.join(['AIRPORT:string,AVG_ARR_DELAY:float,AVG_DEP_DELAY:float',
