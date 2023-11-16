@@ -23,11 +23,16 @@ DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 
 def compute_stats(airport, events):
-    arrived = [event['ARR_DELAY'] for event in events if event['EVENT_TYPE'] == 'arrived']
-    avg_arr_delay = float(np.mean(arrived)) if len(arrived) > 0 else None
+    
+    arrived = [event['ARR_DELAY'] for event in events if event['EVENT_TYPE'] == 'arrived' and event['ARR_DELAY'] is not None]
+    try:
+        avg_arr_delay = float(np.mean(arrived)) if len(arrived) > 0 else None
+    except:
+        print("airports: {} / arrived: {}".format(airport,arrived))
 
-    departed = [event['DEP_DELAY'] for event in events if event['EVENT_TYPE'] == 'departed']
+    departed = [event['DEP_DELAY'] for event in events if event['EVENT_TYPE'] == 'departed' and event['DEP_DELAY'] is not None]
     avg_dep_delay = float(np.mean(departed)) if len(departed) > 0 else None
+    
 
     num_flights = len(events)
     start_time = min([event['EVENT_TIME'] for event in events])
@@ -41,6 +46,7 @@ def compute_stats(airport, events):
         'START_TIME': start_time,
         'END_TIME': latest_time
     }
+        
 
 
 def by_airport(event):

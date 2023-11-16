@@ -21,19 +21,29 @@ import argparse
 import datetime
 import google.cloud.pubsub_v1 as pubsub # Use v1 of the API
 import google.cloud.bigquery as bq
+#from datetime import time, date, timezone
+
+"""dt = datetime.now()
+now_timestamp = dt.replace(tzinfo=timezone.utc).timestamp()"""
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S %Z'
 RFC3339_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S-00:00'
 
+def convert_test_datetime(testDatetime):
+   return datetime.datetime.fromtimestamp(testDatetime.replace(tzinfo=datetime.timezone.utc).timestamp() + deltaTimeDataset)
+
+
 def publish(publisher, topics, allevents, notify_time):
+   notify_time = convert_test_datetime(notify_time)
    timestamp = notify_time.strftime(RFC3339_TIME_FORMAT)
+   
    for key in topics:  # 'departed', 'arrived', etc.
       topic = topics[key]
       events = allevents[key]
       # the client automatically batches
       logging.info('Publishing {} {} till {}'.format(len(events), key, timestamp))
       for event_data in events:
-          publisher.publish(topic, event_data.encode()) #, EventTimeStamp=timestamp)
+          publisher.publish(topic, event_data.encode(), EventTimeStamp=timestamp)
 
 def notify(publisher, topics, rows, simStartTime, programStart, speedFactor):
    # sleep computation
@@ -130,5 +140,10 @@ ORDER BY
    # notify about each row in the dataset
    programStartTime = datetime.datetime.utcnow()
    simStartTime = datetime.datetime.strptime(args.startTime, TIME_FORMAT).replace(tzinfo=pytz.UTC)
+   global deltaTimeDataset
+   deltaTimeDataset = programStartTime.timestamp()-simStartTime.timestamp()
    logging.info('Simulation start time is {}'.format(simStartTime))
    notify(publisher, topics, rows, simStartTime, programStartTime, args.speedFactor)
+   print(u)
+
+   
