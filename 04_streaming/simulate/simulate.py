@@ -21,13 +21,18 @@ import argparse
 import datetime
 import google.cloud.pubsub_v1 as pubsub # Use v1 of the API
 import google.cloud.bigquery as bq
-#from datetime import time, date, timezone
+import os
 
 """dt = datetime.now()
 now_timestamp = dt.replace(tzinfo=timezone.utc).timestamp()"""
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S %Z'
 RFC3339_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S-00:00'
+
+service_account_path='/home/antoine_baret/tech_base_connaissances/udemy-beam/learning beam/demo_streaming/udemy-beam-sa.json'
+
+print("Service account file : ", service_account_path)
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_path
 
 def convert_test_datetime(testDatetime):
    return datetime.datetime.fromtimestamp(testDatetime.replace(tzinfo=datetime.timezone.utc).timestamp() + deltaTimeDataset)

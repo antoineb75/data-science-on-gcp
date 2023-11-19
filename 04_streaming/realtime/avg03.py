@@ -18,16 +18,28 @@ import apache_beam as beam
 import logging
 import json
 import numpy as np
+import os
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
+service_account_path='/home/antoine_baret/tech_base_connaissances/udemy-beam/learning beam/demo_streaming/udemy-beam-sa.json'
+
+print("Service account file : ", service_account_path)
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_path
 
 def compute_stats(airport, events):
     arrived = [event['ARR_DELAY'] for event in events if event['EVENT_TYPE'] == 'arrived']
-    avg_arr_delay = float(np.mean(arrived)) if len(arrived) > 0 else None
+    try:
+        avg_arr_delay = float(np.mean(arrived)) if len(arrived) > 0 else None
+    except:
+        print("airports: {} / arrived: {}".format(airport,arrived))
 
     departed = [event['DEP_DELAY'] for event in events if event['EVENT_TYPE'] == 'departed']
-    avg_dep_delay = float(np.mean(departed)) if len(departed) > 0 else None
+    try:
+        avg_dep_delay = float(np.mean(departed)) if len(departed) > 0 else None
+    except:
+        print("airports: {} / departed: {}".format(airport,departed))
+
 
     num_flights = len(events)
     start_time = min([event['EVENT_TIME'] for event in events])
@@ -79,7 +91,6 @@ def run(project, bucket, region):
                                   )
 
         all_events = (events['arrived'], events['departed']) | beam.Flatten()
-        print(all_events)
 
         stats = (all_events
                  | 'byairport' >> beam.Map(by_airport)
